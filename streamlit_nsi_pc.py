@@ -2,6 +2,7 @@ import streamlit as st
 import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
+import io
 
 def generate_consistent_pc_matrix(n, base_value=3):
     values = np.random.uniform(1, base_value, size=n)
@@ -49,32 +50,59 @@ def plot_histograms(values_list, labels, title):
     ax.legend()
     st.pyplot(fig)
 
+def monte_carlo_simulation(n, deviation, iterations=1000):
+    ci_results = []
+    triad_results = []
+    
+    for _ in range(iterations):
+        consistent_matrix = generate_consistent_pc_matrix(n)
+        nsi_matrix = apply_random_perturbation(consistent_matrix, deviation)
+        
+        ci_index = inconsistency_index_eigen(nsi_matrix)
+        triad_index = inconsistency_index_triads(nsi_matrix)
+        
+        ci_results.append(ci_index)
+        triad_results.append(triad_index)
+    
+    return ci_results, triad_results
+
 def main():
-    st.title("NSI PC Matrix Generator")
+    st.title("NSI PC Matrix Generator & Monte Carlo Simulation")
     
     n = st.slider("Rozmiar macierzy (n x n)", 3, 10, 5)
     deviations = st.multiselect("Wybierz poziomy perturbacji (D)", [0.1, 0.2, 0.3, 0.4, 0.5], default=[0.1, 0.3, 0.5])
+    iterations = st.number_input("Liczba iteracji Monte Carlo", min_value=100, max_value=5000, value=1000, step=100)
     
-    if st.button("Generuj NSI PC Matrices"):
-        matrices = []
+    if st.button("Uruchom symulację Monte Carlo"):
+        results = []
         labels = []
         
         for deviation in deviations:
-            consistent_matrix = generate_consistent_pc_matrix(n)
-            nsi_matrix = apply_random_perturbation(consistent_matrix, deviation)
-            matrices.append(nsi_matrix.flatten())
+            ci_values, triad_values = monte_carlo_simulation(n, deviation, iterations)
             labels.append(f"D={deviation}")
             
-            ci_index = inconsistency_index_eigen(nsi_matrix)
-            triad_index = inconsistency_index_triads(nsi_matrix)
+            st.subheader(f"Monte Carlo wyniki dla D={deviation}")
+            st.write(f"Średni Eigenvalue-based CI: {np.mean(ci_values):.4f}")
+            st.write(f"Średni Triad-based Index: {np.mean(triad_values):.4f}")
             
-            st.subheader(f"Wskaźniki niespójności dla D={deviation}")
-            st.write(f"Eigenvalue-based CI: {ci_index:.4f}")
-            st.write(f"Triad-based Index: {triad_index:.4f}")
-            st.write(pd.DataFrame(nsi_matrix))
+            results.extend([(deviation, ci, triad) for ci, triad in zip(ci_values, triad_values)])
         
-        # Wyświetlanie histogramów dla różnych wartości D
-        plot_histograms(matrices, labels, "Histogram wartości macierzy NSI dla różnych D")
+        df_results = pd.DataFrame(results, columns=["D", "CI", "Triad Index"])
+        
+        # Eksport do CSV
+        csv = df_results.to_csv(index=False).encode('utf-8')
+        st.download_button("Pobierz wyniki jako CSV", data=csv, file_name="monte_carlo_results.csv", mime="text/csv")
+        
+        # Eksport do Excel
+        excel_buffer = io.BytesIO()
+        with pd.ExcelWriter(excel_buffer, engine='xlsxwriter') as writer:
+            df_results.to_excel(writer, index=False, sheet_name="Monte Carlo Results")
+        excel_data = excel_buffer.getvalue()
+        st.download_button("Pobierz wyniki jako Excel", data=excel_data, file_name="monte_carlo_results.xlsx", mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet")
+        
+        # Histogramy wyników Monte Carlo
+        plot_histograms([df_results[df_results["D"] == d]["CI"] for d in deviations], labels, "Histogram CI dla różnych D (Monte Carlo)")
+        plot_histograms([df_results[df_results["D"] == d]["Triad Index"] for d in deviations], labels, "Histogram Triad-based Index dla różnych D (Monte Carlo)")
     
 if __name__ == "__main__":
     main()
