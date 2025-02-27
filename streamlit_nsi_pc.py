@@ -50,6 +50,22 @@ def plot_histograms(values_list, labels, title):
     ax.legend()
     st.pyplot(fig)
 
+def monte_carlo_simulation(n, deviation, iterations=1000):
+    ci_results = []
+    triad_results = []
+    
+    for _ in range(iterations):
+        consistent_matrix = generate_consistent_pc_matrix(n)
+        nsi_matrix = apply_random_perturbation(consistent_matrix, deviation)
+        
+        ci_index = inconsistency_index_eigen(nsi_matrix)
+        triad_index = inconsistency_index_triads(nsi_matrix)
+        
+        ci_results.append(ci_index)
+        triad_results.append(triad_index)
+    
+    return ci_results, triad_results
+
 def main():
     st.title("NSI PC Matrix Generator & Monte Carlo Simulation")
     
@@ -63,15 +79,7 @@ def main():
         
         for n in matrix_sizes:
             for deviation in deviations:
-                ci_values, triad_values = [], []
-                
-                for _ in range(iterations):
-                    consistent_matrix = generate_consistent_pc_matrix(n)
-                    nsi_matrix = apply_random_perturbation(consistent_matrix, deviation)
-                    
-                    ci_values.append(inconsistency_index_eigen(nsi_matrix))
-                    triad_values.append(inconsistency_index_triads(nsi_matrix))
-                    
+                ci_values, triad_values = monte_carlo_simulation(n, deviation, iterations)
                 labels.append(f"n={n}, D={deviation}")
                 
                 st.subheader(f"Monte Carlo wyniki dla n={n}, D={deviation}")
