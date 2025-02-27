@@ -80,19 +80,18 @@ def main():
         results = []
         labels = []
         
-                for n in matrix_sizes:
+        for n in matrix_sizes:
             for deviation in deviations:
-                            ci_values, triad_values = monte_carlo_simulation(n, deviation, iterations)
+                ci_values, triad_values = monte_carlo_simulation(n, deviation, iterations)
                 labels.append(f"n={n}, D={deviation}")
-            labels.append(f"D={deviation}")
-            
-            st.subheader(f"Monte Carlo wyniki dla D={deviation}")
-            st.write(f"Średni Eigenvalue-based CI: {np.mean(ci_values):.4f}")
-            st.write(f"Średni Triad-based Index: {np.mean(triad_values):.4f}")
-            
-            results.extend([(deviation, ci, triad) for ci, triad in zip(ci_values, triad_values)])
+                
+                st.subheader(f"Monte Carlo wyniki dla n={n}, D={deviation}")
+                st.write(f"Średni Eigenvalue-based CI: {np.mean(ci_values):.4f}")
+                st.write(f"Średni Triad-based Index: {np.mean(triad_values):.4f}")
+                
+                results.extend([(n, deviation, ci, triad) for ci, triad in zip(ci_values, triad_values)])
         
-        df_results = pd.DataFrame(results, columns=["D", "CI", "Triad Index"])
+        df_results = pd.DataFrame(results, columns=["n", "D", "CI", "Triad Index"])
         
         # Eksport do CSV
         csv = df_results.to_csv(index=False).encode('utf-8')
