@@ -71,7 +71,6 @@ def main():
     
     matrix_sizes = st.multiselect("Wybierz rozmiary macierzy (n x n)", list(range(3, 21)), default=[5, 10, 15])
     deviations = st.multiselect("Wybierz poziomy perturbacji (D)", [0.01, 0.02, 0.03, 0.04, 0.05, 0.06, 0.07, 0.08, 0.09, 0.1, 0.15, 0.2, 0.25, 0.3, 0.35, 0.4, 0.45, 0.5, 0.55, 0.6, 0.65, 0.7, 0.75, 0.8, 0.85, 0.9, 0.95, 1.0], default=[0.05, 0.2, 0.4])
-            deviations.append(user_deviation)
     iterations = st.number_input("Liczba iteracji Monte Carlo", min_value=100, max_value=1000000, value=1000, step=100)
     
     if st.button("Uruchom symulację Monte Carlo"):
@@ -103,8 +102,8 @@ def main():
         st.download_button("Pobierz wyniki jako Excel", data=excel_data, file_name="monte_carlo_results.xlsx", mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet")
         
         # Histogramy wyników Monte Carlo
-        plot_histograms([df_results[(df_results["n"] == n) & (df_results["D"] == d)]["CI"] for n in matrix_sizes for d in deviations], labels, "Histogram CI dla różnych D (Monte Carlo)")
-        plot_histograms([df_results[(df_results["n"] == n) & (df_results["D"] == d)]["Triad Index"] for n in matrix_sizes for d in deviations], labels, "Histogram Triad-based Index dla różnych D (Monte Carlo)")
+        plot_histograms([df_results[(df_results["n"] == n) & (df_results["D"] == d)]["CI"] for n in matrix_sizes for d in deviations], labels, "Histogram CI dla różnych n i D (Monte Carlo)")
+        plot_histograms([df_results[(df_results["n"] == n) & (df_results["D"] == d)]["Triad Index"] for n in matrix_sizes for d in deviations], labels, "Histogram Triad-based Index dla różnych n i D (Monte Carlo)")
     
 if __name__ == "__main__":
     main()
