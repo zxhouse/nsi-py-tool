@@ -105,8 +105,8 @@ def main():
         st.download_button("Pobierz wyniki jako Excel", data=excel_data, file_name="monte_carlo_results.xlsx", mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet")
         
         # Histogramy wyników Monte Carlo
-        plot_histograms([df_results[df_results["D"] == d]["CI"] for d in deviations], labels, "Histogram CI dla różnych D (Monte Carlo)")
-        plot_histograms([df_results[df_results["D"] == d]["Triad Index"] for d in deviations], labels, "Histogram Triad-based Index dla różnych D (Monte Carlo)")
+        plot_histograms([df_results[(df_results["n"] == n) & (df_results["D"] == d)]["CI"] for n in matrix_sizes for d in deviations], labels, "Histogram CI dla różnych D (Monte Carlo)")
+        plot_histograms([df_results[(df_results["n"] == n) & (df_results["D"] == d)]["Triad Index"] for n in matrix_sizes for d in deviations], labels, "Histogram Triad-based Index dla różnych D (Monte Carlo)")
     
 if __name__ == "__main__":
     main()
