@@ -1,6 +1,7 @@
 import streamlit as st
 import numpy as np
 import pandas as pd
+import matplotlib.pyplot as plt
 
 def generate_consistent_pc_matrix(n, base_value=3):
     values = np.random.uniform(1, base_value, size=n)
@@ -38,6 +39,14 @@ def inconsistency_index_triads(matrix):
                 triad_count += 1
     return inconsistency / triad_count if triad_count > 0 else 0
 
+def plot_histogram(values, title):
+    fig, ax = plt.subplots()
+    ax.hist(values, bins=10, edgecolor='black', alpha=0.7)
+    ax.set_title(title)
+    ax.set_xlabel("Wartość")
+    ax.set_ylabel("Częstotliwość")
+    st.pyplot(fig)
+
 def main():
     st.title("NSI PC Matrix Generator")
     
@@ -60,6 +69,9 @@ def main():
             st.subheader("Wskaźniki niespójności")
             st.write(f"Eigenvalue-based CI: {ci_index:.4f}")
             st.write(f"Triad-based Index: {triad_index:.4f}")
+            
+            # Histogram wyników
+            plot_histogram(nsi_matrix.flatten(), "Histogram wartości macierzy NSI")
     
     elif option == "Ręczne wprowadzenie":
         st.subheader("Wprowadź macierz PC")
@@ -78,6 +90,9 @@ def main():
             st.write(f"Triad-based Index: {triad_index:.4f}")
             st.subheader("Twoja macierz")
             st.write(pd.DataFrame(manual_matrix))
+            
+            # Histogram wyników
+            plot_histogram(manual_matrix.flatten(), "Histogram wartości wprowadzonej macierzy")
         
 if __name__ == "__main__":
     main()
