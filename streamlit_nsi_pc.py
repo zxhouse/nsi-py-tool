@@ -80,9 +80,9 @@ def main():
         results = []
         labels = []
         
-        for n in matrix_sizes:
+                for n in matrix_sizes:
             for deviation in deviations:
-            ci_values, triad_values = monte_carlo_simulation(n, deviation, iterations)
+                            ci_values, triad_values = monte_carlo_simulation(n, deviation, iterations)
                 labels.append(f"n={n}, D={deviation}")
             labels.append(f"D={deviation}")
             
