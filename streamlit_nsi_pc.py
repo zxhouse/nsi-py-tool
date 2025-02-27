@@ -70,10 +70,8 @@ def main():
     st.title("NSI PC Matrix Generator & Monte Carlo Simulation")
     
     matrix_sizes = st.multiselect("Wybierz rozmiary macierzy (n x n)", list(range(3, 21)), default=[5, 10, 15])
-    deviations = st.multiselect("Wybierz poziomy perturbacji (D)", [0.01, 0.02, 0.03, 0.04, 0.05, 0.06, 0.07, 0.08, 0.09, 0.1, 0.15, 0.2, 0.25, 0.3, 0.35, 0.4, 0.45, 0.5, 0.55, 0.6], default=[0.05, 0.2, 0.4])
-    user_deviation = st.number_input("Lub wprowadź własną wartość perturbacji", min_value=0.01, max_value=1.0, step=0.01)
-    if user_deviation not in deviations and user_deviation > 0:
-        deviations.append(user_deviation)
+    deviations = st.multiselect("Wybierz poziomy perturbacji (D)", [0.01, 0.02, 0.03, 0.04, 0.05, 0.06, 0.07, 0.08, 0.09, 0.1, 0.15, 0.2, 0.25, 0.3, 0.35, 0.4, 0.45, 0.5, 0.55, 0.6, 0.65, 0.7, 0.75, 0.8, 0.85, 0.9, 0.95, 1.0], default=[0.05, 0.2, 0.4])
+            deviations.append(user_deviation)
     iterations = st.number_input("Liczba iteracji Monte Carlo", min_value=100, max_value=1000000, value=1000, step=100)
     
     if st.button("Uruchom symulację Monte Carlo"):
